@@ -4,7 +4,8 @@ import { Link , useNavigate} from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { BACKEND_URL } from '../utils/utils';
-function Signup() {
+
+function  AdminSignup() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ function Signup() {
     e.preventDefault();
     try {
    const response = await  axios.post(
-    `${BACKEND_URL}/user/signup`,{
+    `${BACKEND_URL}/admin/signup`,{
         firstName,
         lastName,
         email,
@@ -38,7 +39,7 @@ function Signup() {
       })
       console.log("Signup successful:", response.data);
       toast.success(response.data.message);
-      navigate("/login")
+      navigate("/admin/login")
 
 
     }  catch (error) {
@@ -63,7 +64,7 @@ function Signup() {
           </div>
           <div className="flex items-center space-x-4">
             <Link
-              to={"/login"}
+              to={"/admin/login"}
               className="bg-transparent border border-gray-500 p-1 text-sm md:text-md md:py-2 md:px-4 rounded-md"
             >
               Login
@@ -83,7 +84,7 @@ function Signup() {
             Welcome to <span className="text-orange-500">CourseHaven</span>
           </h2>
           <p className="text-center text-gray-400 mb-6">
-            Just Signup To Join Us!
+            Just signup to mess with Dashboard
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -157,7 +158,7 @@ function Signup() {
               type="submit"
               className="w-full bg-orange-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition"
             >
-              Signup
+              Admin Signup
             </button>
           </form>
         </div>
@@ -166,4 +167,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default AdminSignup

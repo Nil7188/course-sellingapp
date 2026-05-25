@@ -4,9 +4,8 @@ import { Link , useNavigate} from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { BACKEND_URL } from '../utils/utils';
-function Signup() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+function AdminLogin() {
+ 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -18,9 +17,10 @@ function Signup() {
     e.preventDefault();
     try {
    const response = await  axios.post(
-    `${BACKEND_URL}/user/signup`,{
-        firstName,
-        lastName,
+    `${BACKEND_URL}/admin/login`,{
+        
+
+
         email,
         password
 
@@ -36,14 +36,23 @@ function Signup() {
           "Content-Type": "application/json"
         }
       })
-      console.log("Signup successful:", response.data);
+      console.log("Login successful:", response.data);
       toast.success(response.data.message);
-      navigate("/login")
+      localStorage.setItem(
+  "adminInfo",
+  JSON.stringify({
+    token: response.data.token,
+    user: response.data.admin,  
+  })
+);
+      navigate("/admin/dashboard")
 
 
     }  catch (error) {
       if (error.response) {
-        setErrorMessage(error.response.data.error || "Signup failed. Please try again.");
+        setErrorMessage(
+  error.response?.data?.errors || "Login failed. Please try again."
+);
       }
 
     }
@@ -63,10 +72,10 @@ function Signup() {
           </div>
           <div className="flex items-center space-x-4">
             <Link
-              to={"/login"}
+              to={"/admin/signup"}
               className="bg-transparent border border-gray-500 p-1 text-sm md:text-md md:py-2 md:px-4 rounded-md"
             >
-              Login
+              Admin Signup
             </Link>
             <Link
               to={"/courses"}
@@ -83,37 +92,11 @@ function Signup() {
             Welcome to <span className="text-orange-500">CourseHaven</span>
           </h2>
           <p className="text-center text-gray-400 mb-6">
-            Just Signup To Join Us!
+            login in to access paid content
           </p>
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="firstname" className=" text-gray-400 mb-2">
-                Firstname
-              </label>
-              <input
-                type="text"
-                id="firstname"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Type your firstname"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="lastname" className=" text-gray-400 mb-2">
-                Lastname
-              </label>
-              <input
-                type="text"
-                id="lastname"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Type your lastname"
-                required
-              />
-            </div>
+           
 
             <div className="mb-4">
               <label htmlFor="email" className=" text-gray-400 mb-2">
@@ -157,7 +140,7 @@ function Signup() {
               type="submit"
               className="w-full bg-orange-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition"
             >
-              Signup
+              Admin Login
             </button>
           </form>
         </div>
@@ -166,4 +149,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default AdminLogin;

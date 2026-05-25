@@ -3,6 +3,7 @@ import logo from "../../public/logo.webp";
 import { Link , useNavigate} from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { BACKEND_URL } from '../utils/utils';
 function Login() {
  
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ function Login() {
     e.preventDefault();
     try {
    const response = await  axios.post(
-    "http://localhost:4001/api/v1/user/login",{
+    `${BACKEND_URL}/user/login`,{
         
 
 
@@ -37,7 +38,13 @@ function Login() {
       })
       console.log("Login successful:", response.data);
       toast.success(response.data.message);
-      localStorage.setItem("user", JSON.stringify(response.data.token));
+      localStorage.setItem(
+  "userInfo",
+  JSON.stringify({
+    token: response.data.token,
+    user: response.data.user  
+  })
+);
       navigate("/")
 
 
@@ -66,7 +73,7 @@ function Login() {
               to={"/signup"}
               className="bg-transparent border border-gray-500 p-1 text-sm md:text-md md:py-2 md:px-4 rounded-md"
             >
-              Signup
+             Admin Signup
             </Link>
             <Link
               to={"/courses"}

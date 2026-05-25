@@ -9,6 +9,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { toast } from "react-hot-toast";
+import { BACKEND_URL } from '../utils/utils';
 
 
 
@@ -18,31 +19,28 @@ function  Home  ()  {
   const [courses, setCourses]= useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(()=>{
-    const token= localStorage.getItem("user");
-    if(token){
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-
-  }, [])
+  useEffect(() => {
+  const user = JSON.parse(localStorage.getItem("userInfo"));
+  if (user && user.token) {
+    setIsLoggedIn(true);
+  } else {
+    setIsLoggedIn(false);
+  }
+}, []);
   
 
  const handleLogout = async () => {
   try {
-    const response = await axios.get(
-      "http://localhost:4001/api/v1/user/logout",
-      { withCredentials: true }
-    );
+    await axios.get(`${BACKEND_URL}/user/logout`, {
+      withCredentials: true,
+    });
 
-    localStorage.removeItem("user"); // IMPORTANT
-    setIsLoggedIn(false);
+    localStorage.removeItem("userInfo");
+    setIsLoggedIn(false); // UI instantly update
 
-    toast.success(response.data.message);
+    toast.success("Logged out");
   } catch (error) {
-    console.log("error in logout", error);
-    toast.error(error.response.data.errors || "Logout failed");
+    toast.error("Logout failed");
   }
 };
    
@@ -51,7 +49,7 @@ function  Home  ()  {
  useEffect(()=>{
    const fetchCourses=async ()=>{
     try {
-    const responce=await axios.get("http://localhost:4001/api/v1/course/courses",
+    const responce=await axios.get(`${BACKEND_URL}/course/courses`,
       {
         withCredentials:true,
 

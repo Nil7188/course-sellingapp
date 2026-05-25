@@ -1,9 +1,9 @@
 import { Course } from "../models/course.model.js";
 import Purchase from "../models/purchase.model.js";
 import { v2 as cloudinary } from "cloudinary";
-
+import mongoose from "mongoose";
 /* =========================
-   CREATE COURSE
+CREATE COURSE
 ========================= */
 export const createCourse = async (req, res) => {
   try {
@@ -27,7 +27,6 @@ export const createCourse = async (req, res) => {
       });
     }
 
-    // Upload to Cloudinary
     const cloudResponse = await cloudinary.uploader.upload(
       image.tempFilePath,
       { folder: "courses" }
@@ -55,7 +54,7 @@ export const createCourse = async (req, res) => {
 };
 
 /* =========================
-   UPDATE COURSE
+UPDATE COURSE
 ========================= */
 export const updateCourse = async (req, res) => {
   try {
@@ -63,37 +62,31 @@ export const updateCourse = async (req, res) => {
     const { courseId } = req.params;
     const { title, description, price } = req.body;
 
-    const course = await Course.findOne({
+    const course = await Course.findOneAndUpdate({
       _id: courseId,
       creatorId: adminId,
     });
 
     if (!course) {
-      return res.status(404).json({ error: "Course not found" });
+      return res.status(404).json({ errors: "Can't update, created by other admin" });
     }
 
-    // Update text fields
     if (title) course.title = title;
     if (description) course.description = description;
     if (price) course.price = price;
 
-    // If new image uploaded
     if (req.files && req.files.image) {
       const image = req.files.image;
 
       const allowedFormats = ["image/jpg", "image/jpeg", "image/png"];
       if (!allowedFormats.includes(image.mimetype)) {
-        return res.status(400).json({
-          error: "Invalid file format",
-        });
+        return res.status(400).json({ error: "Invalid file format" });
       }
 
-      // Delete old image from Cloudinary
       if (course.image?.public_id) {
         await cloudinary.uploader.destroy(course.image.public_id);
       }
 
-      // Upload new image
       const cloudResponse = await cloudinary.uploader.upload(
         image.tempFilePath,
         { folder: "courses" }
@@ -118,7 +111,7 @@ export const updateCourse = async (req, res) => {
 };
 
 /* =========================
-   DELETE COURSE
+DELETE COURSE
 ========================= */
 export const deleteCourse = async (req, res) => {
   try {
@@ -131,10 +124,9 @@ export const deleteCourse = async (req, res) => {
     });
 
     if (!course) {
-      return res.status(404).json({ error: "Course not found" });
+      return res.status(404).json({ error: "can't delete , created by other admin" });
     }
 
-    // Delete image from Cloudinary
     if (course.image?.public_id) {
       await cloudinary.uploader.destroy(course.image.public_id);
     }
@@ -149,7 +141,7 @@ export const deleteCourse = async (req, res) => {
 };
 
 /* =========================
-   GET ALL COURSES
+GET ALL COURSES
 ========================= */
 export const getCourses = async (req, res) => {
   try {
@@ -162,13 +154,14 @@ export const getCourses = async (req, res) => {
 };
 
 /* =========================
-   COURSE DETAILS
+COURSE DETAILS
 ========================= */
 export const courseDetails = async (req, res) => {
   try {
     const { courseId } = req.params;
 
     const course = await Course.findById(courseId);
+
     if (!course) {
       return res.status(404).json({ error: "Course not found" });
     }
@@ -181,12 +174,31 @@ export const courseDetails = async (req, res) => {
 };
 
 /* =========================
-   BUY COURSE
+BUY COURSE
 ========================= */
+
+   import Stripe from "stripe";
+   import config from "../config.js";
+
+   const stripe = new Stripe(config.STRIPE_SECRET_KEY
+
+   )
+     
+   console.log(config.STRIPE_SECRET_KEY)
+
+
 export const buyCourse = async (req, res) => {
   try {
     const userId = req.userId;
     const { courseId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ error: "Invalid course ID" });
+    }
 
     const course = await Course.findById(courseId);
     if (!course) {
@@ -204,15 +216,33 @@ export const buyCourse = async (req, res) => {
       });
     }
 
-    const newPurchase = await Purchase.create({
-      userId,
-      courseId,
-    });
+    // stripe payment code goes here
+    const amount = course.price * 100;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount ,
+      currency: "usd",
+     payment_method_types: ["card"],
+     
+    })
+                       
+
+    
+
+
+
+
+
+
+   // const newPurchase = await Purchase.create({ userId, courseId, });
 
     return res.status(201).json({
       message: "Course purchased successfully",
-      purchase: newPurchase,
+     // purchase: newPurchase,
+      course,
+      clientSecret: paymentIntent.client_secret,
     });
+
   } catch (error) {
     console.log("Buy course error:", error);
     return res.status(500).json({ error: "Error buying course" });

@@ -12,6 +12,7 @@ import { HiMenu, HiX } from "react-icons/hi"; // Import menu and close icons
 import logo from "../../public/logo.webp";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { BACKEND_URL } from '../utils/utils';
 
 
 function Courses() {
@@ -36,7 +37,7 @@ function Courses() {
  const handleLogout = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:4001/api/v1/user/logout",
+      `${BACKEND_URL}/user/logout`,
       { withCredentials: true }
     );
 
@@ -55,7 +56,7 @@ function Courses() {
  useEffect(()=>{
    const fetchCourses=async ()=>{
     try {
-    const responce=await axios.get("http://localhost:4001/api/v1/course/courses",
+    const responce=await axios.get(`${BACKEND_URL}/course/courses`,
       {
         withCredentials:true,
 

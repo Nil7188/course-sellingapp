@@ -52,12 +52,13 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email: email });
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-    if (!user || !isPasswordCorrect) {
-      return res.status(403).json({ errors: "Invalid credentials" });
+  try {
+    const user = await User.findOne({ email });
+
+    // ✅ Step 1: user check FIRST
+    if (!user) {
+      return res.status(403).json({ errors: "User not found" });
     }
 
     // jwt code

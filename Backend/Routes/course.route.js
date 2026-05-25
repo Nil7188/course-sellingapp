@@ -1,3 +1,4 @@
+
 import express from 'express';
 import { createCourse, deleteCourse, updateCourse, getCourses, courseDetails, buyCourse } from '../controllers/course.controller.js';
 
@@ -12,6 +13,7 @@ router.put("/update/:courseId",adminMiddleware, updateCourse);
 router.delete("/delete/:courseId",adminMiddleware, deleteCourse)
 router.get("/courses", getCourses)
 router.get("/:courseId", courseDetails);
+
 
 
 

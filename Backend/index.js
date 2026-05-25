@@ -5,6 +5,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import courseRoute from './Routes/course.route.js'
 import userRoute from './Routes/user.route.js'
 import adminRoute from './Routes/admin.routes.js'
+import orderRoute from './Routes/order.route.js'
 import cors from 'cors'
 import fileUpload from "express-fileupload";
 import cookieParser from "cookie-parser";
@@ -50,6 +51,7 @@ try{
 app.use("/api/v1/course",courseRoute)
 app.use("/api/v1/user",userRoute)
 app.use("/api/v1/admin",adminRoute)
+app.use("/api/v1/order",orderRoute)
 
 cloudinary.config({ 
         cloud_name: process.env.cloud_name, 
