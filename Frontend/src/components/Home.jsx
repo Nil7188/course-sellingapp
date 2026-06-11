@@ -233,7 +233,7 @@ function  Home  ()  {
 
 
                 </div>
-                <div>Right
+                <div>
                    <div className='items-center flex flex-col'>
 
                   <h3 className='text-lg font-semibold mb-4'>Copyrighys &#169; 2026 </h3>
